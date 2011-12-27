@@ -1,0 +1,1029 @@
+Fwd
+***
+{
+   "rdrive" : "C:",
+   "dataProductDataFolder" : "MnROAD\\Data Product v 1.0\\",
+   "ddByType" : "D. Test Cell Maps and Information\\Design Details by Pavement Type",
+   "measuredDataFolder" : "H. Measured Data\\",
+   "physMeasureFolder" : "Physical Measurements",
+   "loadFolders" : "Load Response\\FWD",
+   "pavementTypes" :
+      {
+         "AggCell" : "AGG - Aggregate",
+         "CompositeCell" : "Composite - HMA & PCC",
+         "HmaCell" : "HMA - Asphalt",
+         "PccCell" : "PCC - Concrete"
+      },
+   "overwriteFwdFiles" : "yes",
+   "throughYear" : "2010",
+   "batchSize" : "1000",
+   "cellsQuery" : "SELECT ID,CELL,CONSTRUCTION_BEGAN_DATE FIRST_LAYER_DATE,CONSTRUCTION_ENDED_DATE,CELL_END_DATE  TO_DATE,DESIGN_NUMBER FROM (SELECT ID,CELL,CELL_TYPE,CONSTRUCTION_BEGAN_DATE,CONSTRUCTION_ENDED_DATE,NVL(DEMOLISHED_DATE,LEAD(CONSTRUCTION_BEGAN_DATE-1,1,NULL) OVER (PARTITION BY CELL ORDER BY CONSTRUCTION_BEGAN_DATE)) CELL_END_DATE,DESIGN_NUMBER FROM (SELECT ID,CELL_NUMBER CELL,SUBSTR(CLASS,24) CELL_TYPE,(SELECT FIRST_LAYER_DATE FROM MNR.CELLS WHERE ID=C.ID) CONSTRUCTION_BEGAN_DATE,CONSTRUCTION_ENDED_DATE,DEMOLISHED_DATE,CASE WHEN LEAD(ID,1,NULL) OVER (PARTITION BY CELL_NUMBER ORDER BY C.CONSTRUCTION_ENDED_DATE DESC) IS NULL THEN 1 WHEN LEAD(ID,2,NULL) OVER (PARTITION BY CELL_NUMBER ORDER BY C.CONSTRUCTION_ENDED_DATE DESC) IS NULL THEN 2 WHEN LEAD(ID,3,NULL) OVER (PARTITION BY CELL_NUMBER ORDER BY C.CONSTRUCTION_ENDED_DATE DESC) IS NULL THEN 3 WHEN LEAD(ID,4,NULL) OVER (PARTITION BY CELL_NUMBER ORDER BY C.CONSTRUCTION_ENDED_DATE DESC) IS NULL THEN 4 WHEN LEAD(ID,5,NULL) OVER (PARTITION BY CELL_NUMBER ORDER BY C.CONSTRUCTION_ENDED_DATE DESC) IS NULL THEN 5 ELSE 1 END DESIGN_NUMBER FROM MNR.CELL C)) WHERE CELL_TYPE=? ORDER BY CELL, CONSTRUCTION_BEGAN_DATE",
+   "fwdQuery" : "SELECT S.SESSION_ID,S.FACILITY_NAME,S.SECTION_NAME CELL,S.LANE,TO_CHAR(S.SESSION_DATE,'yyyy-mm-dd') SESSION_DATE,S.UNITS,S.PAVEMENT_TYPE,S.RADIUS_PLATE_MM,S.SENSOR_OFFSET_X1_MM,S.SENSOR_OFFSET_X2_MM,S.SENSOR_OFFSET_X3_MM,S.SENSOR_OFFSET_X4_MM,S.SENSOR_OFFSET_X5_MM,S.SENSOR_OFFSET_X6_MM,S.SENSOR_OFFSET_X7_MM,S.SENSOR_OFFSET_X8_MM,S.SENSOR_OFFSET_X9_MM,S.SENSOR_OFFSET_X10_MM,T.STATION_ID,T.TEST_SEQUENCE,T.SLAB_ID,T.TEST_POSITION,T.STATION,TO_CHAR(T.DATE_STATION,'yyyy-mm-dd') DATE_STATION,T.TIME_STATION,T.SURFACE_INFRARED_TEMP_C,T.AIR_TEMP_C,T.COMMENT_STATION,D.DROP_ID,D.STRESS_KPA,D.SEQUENCE_NO,D.DEFLECTION_1_MICRONS,D.DEFLECTION_2_MICRONS,D.DEFLECTION_3_MICRONS,D.DEFLECTION_4_MICRONS,D.DEFLECTION_5_MICRONS,D.DEFLECTION_6_MICRONS,D.DEFLECTION_7_MICRONS,D.DEFLECTION_8_MICRONS,D.DEFLECTION_9_MICRONS,D.DEFLECTION_10_MICRONS FROM MNR.CELLS MC JOIN MNR.FWD_SESSION S ON TO_CHAR(MC.CELL)=S.SECTION_NAME AND S.SESSION_DATE BETWEEN MC.FROM_DATE AND NVL(MC.TO_DATE,SYSDATE) JOIN MNR.FWD_STATION T ON T.SESSION_ID=S.SESSION_ID JOIN MNR.FWD_DROP D ON D.STATION_ID=T.STATION_ID",
+   "queryCriteria" : "WHERE MC.TYPE=? AND MC.CELL=? AND S.SESSION_DATE BETWEEN ? AND ?",
+   "queryOrder" : "ORDER BY SESSION_DATE,DATE_STATION,TIME_STATION,SEQUENCE_NO",
+   "countQuery" : "SELECT count(*) ROW_COUNT FROM MNR.CELLS MC JOIN MNR.FWD_SESSION S ON TO_CHAR(MC.CELL)=S.SECTION_NAME AND S.SESSION_DATE BETWEEN MC.FROM_DATE AND NVL(MC.TO_DATE,SYSDATE) JOIN MNR.FWD_STATION T ON T.SESSION_ID=S.SESSION_ID JOIN MNR.FWD_DROP D ON D.STATION_ID=T.STATION_ID"
+}
+---------------------------------------
+Layer
+*****
+{
+   "rdrive" : "C:",
+   "dataProductDataFolder" : "MnROAD\\Data Product v 1.0\\",
+   "ddByType" : "D. Test Cell Maps and Information\\Design Details by Pavement Type",
+   "pavementTypes" :
+      {
+         "AggCell" : "AGG - Aggregate",
+         "CompositeCell" : "Composite - HMA & PCC",
+         "HmaCell" : "HMA - Asphalt",
+         "PccCell" : "PCC - Concrete"
+      },
+   "overwriteLayersFiles" : "y",
+   "AggCellQuery" : "SELECT MC.CELL CELL_NUMBER,C.NAME CELL_NAME,NVL(TO_CHAR(C.DESIGN_LIFE),'') DESIGN_LIFE_YRS,F.NAME FACILITY,R.DESCRIPTION ROAD_SECTION,TO_CHAR(MC.FROM_DATE,'yyyy-mm-dd') BUILT_DATE,TO_CHAR(MC.TO_DATE,'yyyy-mm-dd') DEMOLISHED_DATE,C.START_STATION START_STATION_FT,C.END_STATION END_STATION_FT,C.DRAINAGE_SYSTEM DRAINAGE_SYSTEM,C.SHOULDER_TYPE SHOULDER_TYPE,LN.NAME LANE_NAME,LN.LANE_NUM,LN.WIDTH LANE_WIDTH_FT,LN.OFFSET_REF LANE_OFFSET_REF,L.LAYER_NUM LAYER_NUM,TO_CHAR(L.CONSTRUCT_START_DATE,'yyyy-mm-dd') LAYER_CONSTRUCT_START_DATE,TO_CHAR(L.CONSTRUCT_END_DATE,'yyyy-mm-dd') LAYER_CONSTRUCT_END_DATE,L.THICKNESS/25.4 LAYER_THICKNESS_IN,NVL(M.MN_DOT_SPEC_NUMBER,'n/a') SPEC_NUMBER,M.BASIC_MATERIAL || ' - ' || M.DESCRIPTION  MATERIAL,MC.ID CELL_ID,LN.ID LANE_ID,L.ID LAYER_ID,M.ID MATERIAL_ID FROM MNR.CELLS MC JOIN MNR.CELL C ON MC.ID=C.ID JOIN MNR.LANE LN ON LN.CELL_ID=C.ID JOIN MNR.LAYER L ON L.LANE_ID=LN.ID JOIN MNR.MATERIAL M ON L.MATERIAL_ID=M.ID JOIN MNR.ROAD_SECTION R ON C.ROAD_SECTION_ID=R.ID JOIN MNR.FACILITY F ON R.FACILITY_ID=F.ID",
+   "CompositeCellQuery" : "SELECT MC.CELL CELL_NUMBER,C.NAME CELL_NAME,NVL(TO_CHAR(C.DESIGN_LIFE),'') DESIGN_LIFE_YRS,F.NAME FACILITY,R.DESCRIPTION ROAD_SECTION,TO_CHAR(L.CONSTRUCT_START_DATE,'yyyy-mm-dd') LAYER_CONSTRUCT_START_DATE,TO_CHAR(L.CONSTRUCT_END_DATE,'yyyy-mm-dd') LAYER_CONSTRUCT_END_DATE,TO_CHAR(MC.FROM_DATE,'yyyy-mm-dd') BUILT_DATE,TO_CHAR(MC.TO_DATE,'yyyy-mm-dd') DEMOLISHED_DATE,C.START_STATION START_STATION_FT,C.END_STATION END_STATION_FT,C.DRAINAGE_SYSTEM DRAINAGE_SYSTEM,C.SHOULDER_TYPE SHOULDER_TYPE,LN.NAME LANE_NAME,LN.LANE_NUM,LN.WIDTH LANE_WIDTH_FT,LN.OFFSET_REF LANE_OFFSET_REF,LN.PANEL_LENGTH PANEL_LENGTH_FT,LN.PANEL_WIDTH PANEL_WIDTH_FT,L.LAYER_NUM LAYER_NUM,L.THICKNESS/25.4 LAYER_THICKNESS_IN,NVL(M.MN_DOT_SPEC_NUMBER,'n/a') SPEC_NUMBER,M.BASIC_MATERIAL || ' - ' || M.DESCRIPTION MATERIAL,C.LONGITUDINAL_JOINT_SEAL,C.SURFACE_TEXTURE,C.TIEBARS,L.TRANSVERSE_STEEL,MC.ID CELL_ID,LN.ID LANE_ID,L.ID LAYER_ID,M.ID MATERIAL_ID FROM MNR.CELLS MC JOIN MNR.CELL C ON MC.ID=C.ID JOIN MNR.LANE LN ON LN.CELL_ID=C.ID JOIN MNR.LAYER L ON L.LANE_ID=LN.ID JOIN MNR.MATERIAL M ON L.MATERIAL_ID=M.ID JOIN MNR.ROAD_SECTION R ON C.ROAD_SECTION_ID=R.ID JOIN MNR.FACILITY F ON R.FACILITY_ID=F.ID",
+   "HmaCellQuery" : "SELECT MC.CELL CELL_NUMBER,C.NAME CELL_NAME,NVL(TO_CHAR(C.DESIGN_LIFE),'') DESIGN_LIFE_YRS,F.NAME FACILITY,R.DESCRIPTION ROAD_SECTION,TO_CHAR(L.CONSTRUCT_START_DATE,'yyyy-mm-dd') LAYER_CONSTRUCT_START_DATE,TO_CHAR(L.CONSTRUCT_END_DATE,'yyyy-mm-dd') LAYER_CONSTRUCT_END_DATE,TO_CHAR(MC.FROM_DATE,'yyyy-mm-dd') BUILT_DATE,TO_CHAR(MC.TO_DATE,'yyyy-mm-dd') DEMOLISHED_DATE,C.START_STATION START_STATION_FT,C.END_STATION END_STATION_FT,C.DRAINAGE_SYSTEM DRAINAGE_SYSTEM,C.SHOULDER_TYPE SHOULDER_TYPE,LN.NAME LANE_NAME,LN.LANE_NUM,LN.WIDTH LANE_WIDTH_FT,LN.OFFSET_REF LANE_OFFSET_REF,L.LAYER_NUM LAYER_NUM,L.THICKNESS/25.4 LAYER_THICKNESS_IN,NVL(M.MN_DOT_SPEC_NUMBER,'n/a') SPEC_NUMBER,M.BASIC_MATERIAL || ' - ' || M.DESCRIPTION  MATERIAL,C.HMA_DESIGN,C.SURFACE_TEXTURE,MC.ID CELL_ID,LN.ID LANE_ID,L.ID LAYER_ID,M.ID MATERIAL_ID FROM MNR.CELLS MC JOIN MNR.CELL C ON MC.ID=C.ID JOIN MNR.LANE LN ON LN.CELL_ID=C.ID JOIN MNR.LAYER L ON L.LANE_ID=LN.ID JOIN MNR.MATERIAL M ON L.MATERIAL_ID=M.ID JOIN MNR.ROAD_SECTION R ON C.ROAD_SECTION_ID=R.ID JOIN MNR.FACILITY F ON R.FACILITY_ID=F.ID",
+   "PccCellQuery" : "SELECT MC.CELL CELL_NUMBER,C.NAME CELL_NAME,NVL(TO_CHAR(C.DESIGN_LIFE),'') DESIGN_LIFE_YRS,F.NAME FACILITY,R.DESCRIPTION ROAD_SECTION,TO_CHAR(L.CONSTRUCT_START_DATE,'yyyy-mm-dd') LAYER_CONSTRUCT_START_DATE,TO_CHAR(L.CONSTRUCT_END_DATE,'yyyy-mm-dd') LAYER_CONSTRUCT_END_DATE,TO_CHAR(MC.FROM_DATE,'yyyy-mm-dd') BUILT_DATE,TO_CHAR(MC.TO_DATE,'yyyy-mm-dd') DEMOLISHED_DATE,C.START_STATION START_STATION_FT,C.END_STATION END_STATION_FT,C.DRAINAGE_SYSTEM DRAINAGE_SYSTEM,C.SHOULDER_TYPE SHOULDER_TYPE,LN.NAME LANE_NAME,LN.LANE_NUM,LN.WIDTH LANE_WIDTH_FT,LN.OFFSET_REF LANE_OFFSET_REF,LN.PANEL_LENGTH PANEL_LENGTH_FT,LN.PANEL_WIDTH PANEL_WIDTH_FT,L.LAYER_NUM LAYER_NUM,L.THICKNESS/25.4 LAYER_THICKNESS_IN,NVL(M.MN_DOT_SPEC_NUMBER,'n/a') SPEC_NUMBER,M.BASIC_MATERIAL || ' - ' || M.DESCRIPTION  MATERIAL,C.LONGITUDINAL_JOINT_SEAL,C.SURFACE_TEXTURE,C.TIEBARS,L.TRANSVERSE_STEEL,MC.ID CELL_ID,LN.ID LANE_ID,L.ID LAYER_ID,M.ID MATERIAL_ID FROM MNR.CELLS MC JOIN MNR.CELL C ON MC.ID=C.ID JOIN MNR.LANE LN ON LN.CELL_ID=C.ID JOIN MNR.LAYER L ON L.LANE_ID=LN.ID JOIN MNR.MATERIAL M ON L.MATERIAL_ID=M.ID JOIN MNR.ROAD_SECTION R ON C.ROAD_SECTION_ID=R.ID JOIN MNR.FACILITY F ON R.FACILITY_ID=F.ID"
+}
+---------------------------------------
+Sensor
+******
+{
+   "rdrive" : "C:",
+   "dataProductDataFolder" : "MnROAD\\Data Product v 1.0\\",
+   "sensorInfo" : "E. Sensor Information",
+   "sensorByType" : "Sensor Details by Pavement Type",
+   "pavementTypes" :
+      {
+         "AggCell" : "AGG - Aggregate",
+         "CompositeCell" : "Composite - HMA & PCC",
+         "HmaCell" : "HMA - Asphalt",
+         "PccCell" : "PCC - Concrete"
+      },
+   "overwriteSensorFiles" : "yes",
+   "sensorQuery" : "SELECT C.CELL_NUMBER CELL,C.NAME CELL_NAME,SUBSTR(C.CLASS,24) PAVEMENT_TYPE,SM.MODEL,S.SEQ SEQUENCE,S.SENSOR_DEPTH_IN DEPTH_IN,S.STATION_FT,S.OFFSET_FT,M.BASIC_MATERIAL LAYER_TYPE,TO_CHAR(S.DATE_INSTALLED,'yyyy-mm-dd') DATE_INSTALLED,TO_CHAR(S.DATE_REMOVED,'yyyy-mm-dd') DATE_REMOVED,C.ID CELL_ID,LN.ID LANE_ID,L.ID LAYER_ID FROM MNR.CELL C JOIN MNR.LANE LN ON LN.CELL_ID=C.ID JOIN MNR.LAYER L ON L.LANE_ID=LN.ID JOIN MNR.MATERIAL M ON L.MATERIAL_ID=M.ID JOIN MNR.SENSOR S ON S.LAYER_ID = L.ID JOIN MNR.SENSOR_MODEL SM ON S.SENSOR_MODEL_ID = SM.ID"
+}
+---------------------------------------
+Distress
+********
+{
+   "rdrive" : "C:",
+   "dataProductDataFolder" : "MnROAD\\Data Product v 1.0\\",
+   "ddByType" : "D. Test Cell Maps and Information\\Design Details by Pavement Type",
+   "measuredDataFolder" : "H. Measured Data\\",
+   "physMeasureFolder" : "Physical Measurements",
+   "pavementTypes" :
+      {
+         "AggCell" : "AGG - Aggregate",
+         "CompositeCell" : "Composite - HMA & PCC",
+         "HmaCell" : "HMA - Asphalt",
+         "PccCell" : "PCC - Concrete"
+      },
+   "overwriteDistressFiles" : "true",
+   "throughYear" : "2010",
+   "distressTableFolderMap" :
+      {
+         "DISTRESS_AC" : "Surface Characteristics\\Visual Distress",
+         "DISTRESS_AGG_SURVEY_SEMI" : "Surface Characteristics\\Visual Distress",
+         "DISTRESS_ALPS_RESULTS_RUT" : "Surface Characteristics\\Asphalt Rutting",
+         "DISTRESS_CIRCULR_TEXTR_METER" : "Surface Characteristics\\Texture",
+         "DISTRESS_CUPPING" : "Surface Characteristics\\Crack Cupping",
+         "DISTRESS_FRICTION_DFT" : "Surface Characteristics\\Friction",
+         "DISTRESS_FRICTION_TRAILER" : "Surface Characteristics\\Friction",
+         "DISTRESS_JPCC" : "Surface Characteristics\\Visual Distress",
+         "DISTRESS_LANE_SHOULDER_DROPOFF" : "Surface Characteristics\\Lane - Shoulder Drop-off",
+         "DISTRESS_LIGHTWEIGHT_DEFLECT" : "Soil Strength\\LWD - Lightweight Deflectometer",
+         "DISTRESS_NUCLEAR_DENSITY" : "Soil Strength\\Nuclear Density",
+         "DISTRESS_OBSI_DATA" : "Surface Characteristics\\Noise",
+         "DISTRESS_OBSI_SUMMARY" : "Surface Characteristics\\Noise",
+         "DISTRESS_PCC_FAULTS" : "Surface Characteristics\\Joint Faulting",
+         "DISTRESS_PERMEABILITY_DIRECT" : "Surface Characteristics\\Permeability",
+         "DISTRESS_RIDE_LISA" : "Surface Characteristics\\Ride Quality",
+         "DISTRESS_RIDE_PATHWAYS" : "Surface Characteristics\\Ride Quality",
+         "DISTRESS_RIDE_PAVETECH" : "Surface Characteristics\\Ride Quality",
+         "DISTRESS_RUTTING_DIPSTICK" : "Surface Characteristics\\Asphalt Rutting",
+         "DISTRESS_RUTTING_STRAIGHT_EDGE" : "Surface Characteristics\\Asphalt Rutting",
+         "DISTRESS_SAND_PATCH" : "Surface Characteristics\\Texture",
+         "DISTRESS_SCHMIDT_HAMMER" : "Surface Characteristics\\PCC Strength",
+         "DISTRESS_SOUND_ABSORPTION" : "Surface Characteristics\\Noise",
+         "DISTRESS_WATER_PERMEABILITY" : "Surface Characteristics\\Permeability"
+      },
+   "distressFileNameMap" :
+      {
+         "DISTRESS_AC" : "HMA_DISTRESS",
+         "DISTRESS_JPCC" : "PCC_DISTRESS",
+         "DISTRESS_AGG_SURVEY_SEMI" : "AGG_DISTRESS",
+         "DISTRESS_PCC_FAULTS" : "PCC_JOINT_FAULTING",
+         "DISTRESS_WATER_PERMEABILITY" : "PERMEABILITY"
+      },
+   "columnAliasMap" :
+      {
+         "DISTRESS_CUPPING" : "CELL,LANE,DAY,STATION CRACK_STATION,WHEEL_PATH,CUPPING_X_DISTANCE_INCH,CUPDEPTH_Y_INCH,COMMENTS",
+         "DISTRESS_NUCLEAR_DENSITY" : "CELL,DAY,STATION,OFFSET_FT,LANE,WHEELPATH,OPERATOR,EQUIPMENT,SETUP,MATERIAL_TESTED,RUN1_TRANSVERSE_PCF,RUN2_TRANSVERSE_PCF,RUN3_LONGITUDINAL_PCF,RUN4_LONGITUDINAL_PCF,MOISTURE_CONTENT_PCT,COMMENTS"
+      }
+}
+---------------------------------------
+Material Samples
+****************
+{
+   "rdrive" : "C:",
+   "dataProductDataFolder" : "MnROAD\\Data Product v 1.0\\",
+   "materialSamplesFolder" : "I. Material Samples\\",
+   "overwriteMatSamplesFiles" : "true",
+   "tableName" : "MNR.MAT_SAMPLES",
+   "fileName" : "MaterialSamples.csv",
+   "countQuery" : "SELECT COUNT(*) ROW_COUNT FROM MNR.MAT_SAMPLES",
+   "mat_samples_columns" :
+      [
+         "MS.MNROAD_ID",
+         "MS.CELL",
+         "STATION",
+         "OFFSET",
+         "SAMPLE_DATE",
+         "MATERIAL_GROUP",
+         "MS.COMMENTS"
+      ],
+   "selectPhrase" : "SELECT MNROAD_ID, CELL, STATION, OFFSET, TO_CHAR(SAMPLE_DATE,'yyyy-mm-dd') SAMPLE_DATE, MATERIAL_GROUP, CONTAINER_TYPE, STORAGE_LOCATION, COMMENTS, FIELD_ID, CONTACT_PERSON, COURSE, LIFT_NUMBER, DEPTH_CODE, SAMPLE_DEPTH_TOP, SAMPLE_DEPTH_BOTTOM, SAMPLE_TIME, SAMPLE_CURE_TIME, SPEC",
+   "querySuffix" : "MS",
+   "queryOrder" : "MS.CELL, MNROAD_ID",
+   "wherePhrase" : "WHERE MS.CELL > 0",
+   "testQueryOrder" : "MS.CELL,STATION,OFFSET,SAMPLE_DATE",
+   "asphaltFolder" : "Asphalt",
+   "concreteFolder" : "Concrete",
+   "aggregateSoilFolder" : "Aggregate & Soil",
+   "asphalt" :
+      {
+         "MNR.MAT_BINDER_ABCD_TEST" : "\"\"",
+         "MNR.MAT_BINDER_BBR_TEST" : "\"\"",
+         "MNR.MAT_BINDER_CRITICAL_CRACK_TEMP" : "\"\"",
+         "MNR.MAT_BINDER_DENT_FRACTURE" : "\"\"",
+         "MNR.MAT_BINDER_DILATOMETR_TST" : "\"\"",
+         "MNR.MAT_BINDER_DSR_TESTS" : "\"\"",
+         "MNR.MAT_BINDER_DT_TEST" : "\"\"",
+         "MNR.MAT_BINDER_FATIGUE" : "\"\"",
+         "MNR.MAT_BINDER_REPEATED_CREEP" : "\"\"",
+         "MNR.MAT_BINDER_STRAIN_SWEEPS" : "\"\"",
+         "MNR.MAT_BINDER_TRAD_TESTS" : "\"\"",
+         "MNR.MAT_CORE_LENGTHS" : "WHERE MS.CELL > 0 and MS.material_group like '%Bituminous%'",
+         "MNR.MAT_HMA_AGING" : "\"\"",
+         "MNR.MAT_HMA_APA" : "\"\"",
+         "MNR.MAT_HMA_BBR_TEST" : "\"\"",
+         "MNR.MAT_HMA_COMPLEX_SHEAR_MODU" : "\"\"",
+         "MNR.MAT_HMA_CORE_TESTS" : "\"\"",
+         "MNR.MAT_HMA_DCT_TEST" : "\"\"",
+         "MNR.MAT_HMA_DILATOMETRIC_TEST" : "\"\"",
+         "MNR.MAT_HMA_DYNAMIC_MODULUS" : "\"\"",
+         "MNR.MAT_HMA_FLOW_NUMBER" : "\"\"",
+         "MNR.MAT_HMA_HAMBURG" : "\"\"",
+         "MNR.MAT_HMA_IDT_TEST" : "\"\"",
+         "MNR.MAT_HMA_INDIRECT_TENS_FATI" : "\"\"",
+         "MNR.MAT_HMA_MIX_TESTS" : "\"\"",
+         "MNR.MAT_HMA_ORIGINAL_DENSITY_AIR" : "\"\"",
+         "MNR.MAT_HMA_REPEAT_PERM_DEFORM" : "\"\"",
+         "MNR.MAT_HMA_REPEAT_SHEAR" : "\"\"",
+         "MNR.MAT_HMA_SCB_TEST" : "\"\"",
+         "MNR.MAT_HMA_SENB_TEST" : "\"\"",
+         "MNR.MAT_HMA_SIEVE_DATA" : "\"\"",
+         "MNR.MAT_HMA_TRIAXIAL_STATIC_CREEP" : "\"\"",
+         "MNR.MAT_HMA_TRIAXIAL_STRENGTH" : "\"\"",
+         "MNR.MAT_HMA_TSRST_TEST" : "\"\"",
+         "MNR.MAT_HMA_TTI_OVERLAY" : "\"\"",
+         "MNR.MAT_HMA_ULTRASONIC_MODULUS" : "\"\""
+      },
+   "concrete" :
+      {
+         "MNR.MAT_CONC_AIR_VOID_RESULTS" : "\"\"",
+         "MNR.MAT_CONC_FIELD_RESULTS" : "\"\"",
+         "MNR.MAT_CONC_FLEX_STRENGTH" : "\"\"",
+         "MNR.MAT_CONC_FREEZE_THAW_RESULTS" : "\"\"",
+         "MNR.MAT_CONC_MOD_POISSON_RESULTS" : "\"\"",
+         "MNR.MAT_CONC_MIX_GRAD_RESULTS" : "\"\"",
+         "MNR.MAT_CONC_RAPID_CHLORIDE" : "\"\"",
+         "MNR.MAT_CONC_STRENGTH_RESULTS" : "\"\"",
+         "MNR.MAT_CONC_THERMAL_EXPANSION" : "\"\"",
+         "MNR.MAT_CORE_LENGTHS" : "WHERE MS.CELL > 0 and MS.material_group like '%Concrete%'"
+      },
+   "aggregateSoil" :
+      {
+         "MNR.MAT_SOIL_MR_RESULTS" : "\"\"",
+         "MNR.MAT_SOIL_TESTS" : " LEFT JOIN MNR.MAT_PROCTOR_CURVES MPC ON MST.PROCTOR_CURVE = MPC.PROCTOR_CURVE WHERE MS.CELL > 0",
+         "MNR.MAT_UNBOUND_GRADATIONS" : "\"\"",
+         "MNR.MAT_UNBOUND_TUBE_SUCTION" : "\"\""
+      },
+   "materialTestsFileMap" :
+      {
+         "MNR.MAT_BINDER_ABCD_TEST" : "binder abcd test",
+         "MNR.MAT_BINDER_BBR_TEST" : "binder bbr test",
+         "MNR.MAT_BINDER_CRITICAL_CRACK_TEMP" : "binder critical cracking temperature",
+         "MNR.MAT_BINDER_DENT_FRACTURE" : "binder dent fracture test",
+         "MNR.MAT_BINDER_DILATOMETR_TST" : "binder dilatometer test",
+         "MNR.MAT_BINDER_DSR_TESTS" : "binder dsr test",
+         "MNR.MAT_BINDER_DT_TEST" : "binder direct tension test",
+         "MNR.MAT_BINDER_FATIGUE" : "binder fatigue test",
+         "MNR.MAT_BINDER_REPEATED_CREEP" : "binder repeated creep test",
+         "MNR.MAT_BINDER_STRAIN_SWEEPS" : "binder strain sweep test",
+         "MNR.MAT_BINDER_TRAD_TESTS" : "binder traditional tests",
+         "MNR.MAT_CORE_LENGTHS" : "core lengths",
+         "MNR.MAT_HMA_AGING" : "hma aging",
+         "MNR.MAT_HMA_APA" : "hma apa test",
+         "MNR.MAT_HMA_BBR_TEST" : "hma bbr test",
+         "MNR.MAT_HMA_COMPLEX_SHEAR_MODU" : "hma complex shear modulus",
+         "MNR.MAT_HMA_CORE_TESTS" : "hma core tests",
+         "MNR.MAT_HMA_DCT_TEST" : "hma dct test",
+         "MNR.MAT_HMA_DILATOMETRIC_TEST" : "hma dilatometric test",
+         "MNR.MAT_HMA_DYNAMIC_MODULUS" : "hma dynamic modulus test",
+         "MNR.MAT_HMA_FLOW_NUMBER" : "hma flow number test",
+         "MNR.MAT_HMA_HAMBURG" : "hma hamburg test",
+         "MNR.MAT_HMA_IDT_TEST" : "hma idt test",
+         "MNR.MAT_HMA_INDIRECT_TENS_FATI" : "hma indirect tensile fatigue test",
+         "MNR.MAT_HMA_MIX_TESTS" : "hma mix volumetric tests",
+         "MNR.MAT_HMA_ORIGINAL_DENSITY_AIR" : "hma original air voids",
+         "MNR.MAT_HMA_REPEAT_PERM_DEFORM" : "hma repeated permanent deformation test",
+         "MNR.MAT_HMA_REPEAT_SHEAR" : "hma repeated shear test",
+         "MNR.MAT_HMA_SCB_TEST" : "hma scb test",
+         "MNR.MAT_HMA_SENB_TEST" : "hma senb test",
+         "MNR.MAT_HMA_SIEVE_DATA" : "hma sieve data",
+         "MNR.MAT_HMA_TRIAXIAL_STATIC_CREEP" : "hma triaxial static creep test",
+         "MNR.MAT_HMA_TRIAXIAL_STRENGTH" : "hma triaxial strength test",
+         "MNR.MAT_HMA_TSRST_TEST" : "hma tsrst test",
+         "MNR.MAT_HMA_TTI_OVERLAY" : "hma tti overlay test",
+         "MNR.MAT_HMA_ULTRASONIC_MODULUS" : "hma ultrasonic modulus test",
+         "MNR.MAT_CONC_AIR_VOID_RESULTS" : "pcc air void results",
+         "MNR.MAT_CONC_FIELD_RESULTS" : "pcc field test results",
+         "MNR.MAT_CONC_FLEX_STRENGTH" : "pcc flexural strength test",
+         "MNR.MAT_CONC_FREEZE_THAW_RESULTS" : "pcc freeze thaw test",
+         "MNR.MAT_CONC_MOD_POISSON_RESULTS" : "pcc modulus-poisson test",
+         "MNR.MAT_CONC_RAPID_CHLORIDE" : "pcc rapid chloride permeability test",
+         "MNR.MAT_CONC_STRENGTH_RESULTS" : "pcc compressive strength test",
+         "MNR.MAT_CONC_THERMAL_EXPANSION" : "pcc thermal expansion test",
+         "MNR.MAT_CONC_MIX_GRAD_RESULTS" : "pcc gradation test",
+         "MNR.MAT_SOIL_MR_RESULTS" : "resilient modulus test",
+         "MNR.MAT_SOIL_TESTS" : "traditional soil tests",
+         "MNR.MAT_UNBOUND_GRADATIONS" : "unbound gradation test",
+         "MNR.MAT_UNBOUND_TUBE_SUCTION" : "tube suction test"
+      },
+   "MAT_BINDER_ABCD_TEST" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESCRIPTION",
+         "CONDITION",
+         "CRACK_TEMP_C",
+         "STRAIN_JUMP_MICROSTRAIN",
+         "COOLING_RATE_DEGC_HR"
+      ],
+   "MAT_BINDER_BBR_TEST" :
+      [
+         "DESCRIPTION",
+         "HMA_LIFT",
+         "SAMPLE_TYPE",
+         "TEST_DATE",
+         "TESTING_LAB",
+         "FILE_NAME",
+         "TARGET_TEMP_C",
+         "WIDTH_MM",
+         "THICK_MM",
+         "TIME_SEC",
+         "P_FORCE_MN",
+         "DEFLECTION_MM",
+         "MEASURED_STIFFNESS_MPA",
+         "M_VALUE",
+         "FTEMP_STIFFNESS",
+         "FTEMP_MVALUE",
+         "LOW_TEMP_PGGRADE"
+      ],
+   "MAT_BINDER_CRITICAL_CRACK_TEMP" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "DESCRIPTION",
+         "CONDITION",
+         "S_300_MPA",
+         "M_POINT_300",
+         "STRAIN_1_PERCENT",
+         "PC_24",
+         "PC_18",
+         "BBR_PC_18",
+         "BBR_DENT_PC_1"
+      ],
+   "MAT_BINDER_DENT_FRACTURE" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "DESCRIPTION",
+         "CONDITION",
+         "TEMP_C",
+         "FRACTURE_TOUGHNESS_KPA_SQRTMTR",
+         "FAIL_STRESS_MPA",
+         "FAIL_STRAIN",
+         "PEAK_LOAD_KN",
+         "STRAIN_RATE_PERCENT_PER_MINUTE"
+      ],
+   "MAT_BINDER_DILATOMETR_TST" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "THERMAL_CYCLE",
+         "GLASS_TRANS_TEMP_C",
+         "COEFF_BELOW_TG",
+         "COEFF_ABOVE_TG"
+      ],
+   "MAT_BINDER_DSR_TESTS" :
+      [
+         "MNROAD_ID_COMMENT",
+         "HMA_LIFT",
+         "LAB_ID",
+         "TESTING_LAB",
+         "TEST_DATE",
+         "DESCRIPTION",
+         "SAMPLE_TYPE",
+         "FREQ_RAD_S",
+         "DELTA_DEGREES",
+         "GPRIME_PA",
+         "GDOUBLEPRIME_PA",
+         "GSTAR_PA",
+         "G_TIMES_SIN_DELTA_KPA",
+         "G_DIV_SIN_DELTA_KPA",
+         "GAP_MICROMETERS",
+         "VISCOSITY_PA_S",
+         "TORQUE_MICRONEWTON_M",
+         "PERCENT_STRAIN",
+         "TEMP_C",
+         "DIAMETER_MM",
+         "OSC_STRESS_PA",
+         "FAIL_TEMP_C",
+         "HIGH_TEMP_PG_GRADE_C"
+      ],
+   "MAT_BINDER_DT_TEST" :
+      [
+         "SAMPLE_TYPE",
+         "DESCRIPTION",
+         "TEST_DATE",
+         "TESTED_BY",
+         "TARGET_TEMP_C",
+         "DIRECT_TENSION_STRAIN",
+         "DIRECT_TENSION_STRESS_MPA",
+         "STRAIN_RATE_PERCENT_PER_MINUTE"
+      ],
+   "MAT_BINDER_FATIGUE" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "DESCRIPTION",
+         "CONDITION",
+         "FREQ_RAD_S",
+         "DELTA_DEGREES",
+         "GPRIME_PA",
+         "GDOUBLEPRIME_PA",
+         "GSTAR_PA",
+         "GAP_MICROMETERS",
+         "VISCOSITY_PA_S",
+         "STRESS_PA",
+         "TORQUE_MICRON_M",
+         "STRAIN_PERCENT",
+         "TEMP_C",
+         "TIME_SEC",
+         "CYCLE_N",
+         "DISSIPATED_ENERGY_WN",
+         "DISSIPATED_ENERGY_RATIO_DER"
+      ],
+   "MAT_BINDER_REPEATED_CREEP" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "DESCRIPTION",
+         "CONDITION",
+         "COMPLIANCE_M2_PER_NEWTON",
+         "GAP_MICROMETERS",
+         "TIME_SEC",
+         "SHEAR_STRESS_PA",
+         "STRAIN",
+         "TEMP_C",
+         "TORQUE_MICRON_M",
+         "VISCOSITY_PA_S",
+         "DIAMETER_MM"
+      ],
+   "MAT_BINDER_STRAIN_SWEEPS" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "DESCRIPTION",
+         "CONDITION",
+         "FREQ_RAD_S",
+         "DELTA_DEGREES",
+         "GPRIME_PA",
+         "GDOUBLEPRIME_PA",
+         "GSTAR_PA",
+         "G_TIMES_SIN_DELTA_KPA",
+         "G_DIV_SIN_DELTA_KPA",
+         "GAP_MICROMETERS",
+         "VISCOSITY_PA_S",
+         "TORQUE_MICRON_M",
+         "STRAIN_PERCENT",
+         "TEMP_C",
+         "TIME_SEC",
+         "DIAMETER_MM"
+      ],
+   "MAT_BINDER_TRAD_TESTS" :
+      [
+         "LAB_NO",
+         "DESCRIPTION",
+         "TEST_DATE",
+         "TESTING_LAB",
+         "WEIGHT_GALLON_60F",
+         "PEN_77F",
+         "PEN_40F",
+         "PEN_55F",
+         "PEN_90F",
+         "VISC_140F",
+         "VISC_275F",
+         "DUCTILITY_77F",
+         "SOFTENING_POINT",
+         "TFO_TEST_PERCENT_LOSS",
+         "TFO_PEN_RES_PERCENT_ORIGINAL",
+         "TFO_DUCT_RES_77F",
+         "TFO_DUCT_RES_140F",
+         "TFO_DUCT_RES_275F",
+         "TFO_SOFTENING_POINT"
+      ],
+   "MAT_CORE_LENGTHS" :
+      [
+         "CORE_LENGTH_LAB_IN",
+         "SPEC_LENGTH_IN",
+         "DEG_0_LENGTH_IN",
+         "DEG_90_LENGTH_IN",
+         "DEG_180_LENGTH_IN",
+         "DEG_270_LENGTH_IN"
+      ],
+   "MAT_HMA_AGING" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAM_ID",
+         "FIELD_ID",
+         "HMA_LIFT",
+         "DEPTH_FROM_TOP_IN",
+         "SAMPLE_THICKNESS_IN",
+         "HIGH_PG_TEMP_C",
+         "AC_PERCENT",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_APA" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_NAME",
+         "SAMPLE_TYPE",
+         "POSITION",
+         "AIR_VOIDS_PERCENT",
+         "TEMP_C",
+         "STROKES",
+         "RUT_MM",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_BBR_TEST" :
+      [
+         "TESTING_LAB",
+         "SPECIMEN",
+         "TEST_DATE",
+         "TARGET_TEMP_C",
+         "SOAK_TIME_MINUTES",
+         "LENGTH_MM",
+         "WIDTH_MM",
+         "THICK_MM",
+         "TIME_SEC",
+         "STIFFNESS_MPA",
+         "M_VALUE"
+      ],
+   "MAT_HMA_COMPLEX_SHEAR_MODU" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "TEMP_F",
+         "FREQUENCY_HZ",
+         "MICROSTRAIN",
+         "GSTAR_PSI",
+         "PHASE_ANGLE_DEG",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_CORE_TESTS" :
+      [
+         "TEST_DATE",
+         "LOCATION_DESC",
+         "LAB",
+         "LIFT_NUMBER",
+         "LIFT_DESC",
+         "LIFT_THICKNESS_IN",
+         "MAX_SPG_USED",
+         "MAX_SPG_SOURCE",
+         "INP_GMB",
+         "INP_VOIDS_PERCENT",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_DCT_TEST" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "TEMP_C",
+         "FRACTURE_ENERGY_J_PER_M2"
+      ],
+   "MAT_HMA_DILATOMETRIC_TEST" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "THERMAL_CYCLE",
+         "GLASS_TRANS_TEMP_C",
+         "COEFF_BELOW_TG",
+         "COEFF_ABOVE_TG"
+      ],
+   "MAT_HMA_DYNAMIC_MODULUS" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_NO",
+         "AIR_VOIDS_PERCENT",
+         "HEIGHT_MM",
+         "DIAMETER_MM",
+         "TEMP_C",
+         "FREQUENCY_HZ",
+         "DYNAMIC_MODULUS_GPA",
+         "PHASE_ANGLE_DEG"
+      ],
+   "MAT_HMA_FLOW_NUMBER" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESCRIPTION",
+         "SPECIMEN",
+         "TEMP_C",
+         "CONFINING_PRESSURE_KPA",
+         "FLOW_NUMBER_NCHRP",
+         "TOTAL_STRAIN_NCHRP",
+         "TOTAL_CYCLES_NCHRP",
+         "FLOW_NUMBER_FRANKEN",
+         "TOTAL_STRAIN_FRANKEN",
+         "TOTAL_CYCLES_FRANKEN"
+      ],
+   "MAT_HMA_HAMBURG" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESCRIPTION",
+         "CONDITION",
+         "TEMP_C",
+         "NO_PASSES",
+         "RUT_DEPTH_MM"
+      ],
+   "MAT_HMA_IDT_TEST" :
+      [
+         "TEST_DATE",
+         "TESTING_LAB",
+         "SAMPLE_DESC",
+         "TEMP_C",
+         "TENSILE_STRESS_PA",
+         "MODULUS_PA",
+         "LOADING_SEC",
+         "CREEP_COMPLIANCE_1_PA",
+         "M_VALUE",
+         "POISSONS_RATIO",
+         " COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_INDIRECT_TENS_FATI" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "HEIGHT_INCH",
+         "LOAD_LBS",
+         "TENSILE_STRESS_PSI",
+         "STRESS_STRENGTH_RATIO",
+         "INITIAL_MICROSTRAIN",
+         "CYCLES_TO_FAILURE",
+         "CYCLES_TO_HALF_MR",
+         "INITIAL_RESILIENT_MOD_KSI",
+         "TEMP_F",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_MIX_TESTS" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "NUMBER_BLOWS",
+         "BULK_SP_GRAVITY",
+         "RICE_SP_GRAVITY",
+         "AIR_VOIDS_PERCENT",
+         "VMA_PERCENT",
+         "STABILITY",
+         "FLOW",
+         "EXTRACTED_AC_PERCENT",
+         "INCINERATOR_AC_PERCENT",
+         "TENSILE_STRENGTH_RATIO",
+         "FINE_AGG_ANGULARITY",
+         "COARSE_AGG_ANGULARITY",
+         "MIX_MOISTURE_PERCENT",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_ORIGINAL_DENSITY_AIR" :
+      [
+         "DESCRIPTION",
+         "HMA_LIFT",
+         "LIFT_DESCRIPTION",
+         "TESTING_LAB",
+         "LIFT_THICKNESS_INCHES",
+         "BULK_SPECIFIC_GRAVITY",
+         "THEO_MAX_SPECIFIC_GRAVITY",
+         "AIR_VOID_PERCENT",
+         "RESULTS_COMMENT"
+      ],
+   "MAT_HMA_REPEAT_PERM_DEFORM" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "AC_PERCENT",
+         "AIR_VOIDS_PERCENT",
+         "TEMP_F",
+         "CONFINING_PRESSURE_PSI",
+         "VERTICAL_STRESS_PSI",
+         "INTERCEPT_A",
+         "SLOPE_B",
+         "RESILIENT_STRAIN_200_PERCENT",
+         "FLOW_NUMBER",
+         "TOTAL_NO_CYCLES",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_REPEAT_SHEAR" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "AIR_VOIDS_PERCENT",
+         "TEMP_F",
+         "SHEAR_STRESS_PSI",
+         "CYCLE_NO",
+         "PERM_SHEAR_STRAIN_PERCENT",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_SCB_TEST" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_NAME",
+         "TEMP_C",
+         "THICKNESS_MM",
+         "NOTCH_LENGTH_MM",
+         "RADIUS_MM",
+         "FRACTURE_ENERGY",
+         "FRACTURE_TOUGHNESS",
+         "STIFFNESS"
+      ],
+   "MAT_HMA_SENB_TEST" :
+      [
+         "SAMPLE_DESC",
+         "TESTING_LAB",
+         "TEST_DATE",
+         "TEMP_C",
+         "FRACTURE_ENERGY_J_PER_M2"
+      ],
+   "MAT_HMA_SIEVE_DATA" :
+      [
+         "LAB",
+         "TEST_DATE",
+         "SAMPLE_TYPE",
+         "THREE_FOURTHS",
+         "FIVE_EIGHTHS",
+         "ONE_HALF",
+         "THREE_EIGHTHS",
+         "NO_4",
+         "NO_8",
+         "NO_10",
+         "NO_20",
+         "NO_40",
+         "NO_80",
+         "NO_200",
+         "NO_16",
+         "NO_30",
+         "NO_50",
+         "NO_100"
+      ],
+   "MAT_HMA_TRIAXIAL_STATIC_CREEP" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "AC_PERCENT",
+         "AIR_VOIDS_PERCENT",
+         "TEMP_F",
+         "CONFINING_PRESSURE_PSI",
+         "VERTICAL_STRESS_PSI",
+         "INTERCEPT_A",
+         "COMPLIANCE_AT_1SEC",
+         "SLOPE_B",
+         "FLOW_TIME_SEC",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_TRIAXIAL_STRENGTH" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "AC_PERCENT",
+         "AIR_VOIDS_PERCENT",
+         "CONFINING_PRESSURE_PSI",
+         "TEMP_F",
+         "MAX_DEVIATORIC_STRESS_PSI",
+         "MAX_NORMAL_STRESS_PSI",
+         "PERCENT_STRAIN",
+         "STRAIN_RATE_IN_PER_MIN",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_TSRST_TEST" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "FRACTURE_TEMP_C",
+         "FRACTURE_STRENGTH_MPA",
+         "SLOPE_MPA_C",
+         "TRANSITION_TEMP_C",
+         "FAILURE_LOCATION",
+         "FAILURE_TYPE"
+      ],
+   "MAT_HMA_TTI_OVERLAY" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "TEMP_C",
+         "AIR_VOIDS_PERCENT",
+         "START_LOAD_LBS",
+         "FINAL_LOAD_LBS",
+         "PERCENT_LOAD_DECLINE",
+         "NO_CYCLES",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_HMA_ULTRASONIC_MODULUS" :
+      [
+         "TESTING_LAB",
+         "TEST_DATE",
+         "SAMPLE_DESC",
+         "HEIGHT_MM",
+         "DENSITY_KG_M3",
+         "AIR_VOIDS_PERCENT",
+         "TEMP_F",
+         "ELASTIC_MODULUS_PSI",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_CONC_AIR_VOID_RESULTS" :
+      [
+         "DATE_TESTED",
+         "PERCENT_AIR",
+         "SPECIFIC_SURFACE",
+         "SPACING_FACTOR",
+         "VOIDS_PER_INCH",
+         "PASTE_TO_AIR",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_CONC_FIELD_RESULTS" :
+      [
+         "DATE_TESTED",
+         "SLUMP_INCH",
+         "PERCENT_AIR",
+         "UNIT_WEIGHT_PCF",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_CONC_FLEX_STRENGTH" :
+      [
+         "SAMPLE_ID",
+         "TEST_TYPE",
+         "DATE_TESTED",
+         "TEST_AGE_DAYS",
+         "FLEX_STRENGTH_PSI",
+         "DEPTH_IN",
+         "LENGTH_IN",
+         "WEIGHT_LBS",
+         "COMMENTS TEST_COMMENT"
+      ],
+   "MAT_CONC_FREEZE_THAW_RESULTS" :
+      [
+         "NUMBER_OF_CYCLES",
+         "DATE_TESTED",
+         "DATE_CAST",
+         "WEIGHT_CHANGE",
+         "RELATIVE_DYNAMIC_MOD",
+         "TOTAL_NMBR_CYCLES",
+         "TOTAL_WEIGHT_CHANGE",
+         "FINAL_REL_DYN_MOD",
+         "COMMENTS TEST_COMMENT",
+         "LENGTH"
+      ],
+   "MAT_CONC_MOD_POISSON_RESULTS" :
+      [
+         "DATE_TESTED",
+         "TEST_AGE_DAYS",
+         "STATIC_MODULUS_ELASTICITY_PSI",
+         "POISSON_RATIO",
+         "AVG_STATIC_MOD_ELASTICITY_PSI",
+         "AVERAGE_POISSON_RATIO",
+         "DIAMETER_IN",
+         "CAPPED_LENGTH_IN",
+         "COMMENTS TEST_COMMENT",
+         "DYNAMIC_MODULUS_ELASTICITY_PSI"
+      ],
+   "MAT_CONC_RAPID_CLORIDE" :
+      [
+         "SAMPLE_NO",
+         "TRIAL",
+         "SAMPLE_DESCRIPTION",
+         "SAMPLE_DIAMETER_IN",
+         "SAMPLE_LENGTH_IN",
+         "DATE_CAST",
+         "DATE_TESTED",
+         "AGE_DAYS",
+         "COULOMBS",
+         "MILLIAMPS_MAX"
+      ],
+   "MAT_CONC_STRENGTH_RESULTS" :
+      [
+         "TEST_TYPE",
+         "DATE_TESTED",
+         "LAB_ID",
+         "TEST_AGE_DAYS",
+         "STRENGTH_PSI",
+         "AVE_STRENGTH_PSI",
+         "DIAMETER_IN",
+         "LENGTH_IN",
+         "CAPPED_LENGTH_IN",
+         "COMMENTS TEST_COMMENT",
+         "WEIGHT_LBS"
+      ],
+   "MAT_CONC_THERMAL_EXPANSION" :
+      [
+         "SAMPLE_ID",
+         "CTE_PER_DEGC",
+         "COMMENTS TEST_COMMENT",
+         "DIAMETER_IN",
+         "LENGTH_IN",
+         "DATE_CAST",
+         "DATE_TESTED",
+         "TEST_AGE_DAYS"
+      ],
+   "MAT_CONC_MIX_GRAD_RESULTS" :
+      [
+         "LAB_SAMPLE_ID",
+         "AGGREGATE_TYPE",
+         "PIT_NUMBER",
+         "PIT_NAME",
+         "TESTING_LAB",
+         "PASSING_NUM_4",
+         "PASSING_NUM_8",
+         "PASSING_NUM_16",
+         "PASSING_NUM_30",
+         "PASSING_NUM_50",
+         "PASSING_NUM_100",
+         "PASSING_NUM_200",
+         "PASSING_1_IN",
+         "PASSING_1_12_IN",
+         "PASSING_2_IN",
+         "PASSING_34_IN",
+         "PASSING_12_IN",
+         "PASSING_38_IN",
+         "FINENESS_MODULUS"
+      ],
+   "MAT_SOIL_TESTS" :
+      [
+         "LAB_SAMPLE_ID",
+         "TEST_TYPE",
+         "SUBTEST_NAME",
+         "TEST_DATE",
+         "TEST_LAB_NAME",
+         "PROCTOR_CURVE",
+         "TEST_RESULT",
+         "TEST_RESULT_CHAR",
+         "MPC.OPTIMUM_MC_PCT_DRY_WT",
+         "MPC.MAXIMUM_DRY_DENSITY_PCF"
+      ],
+   "MAT_UNBOUND_GRADATIONS" :
+      [
+         "TEST_DATE",
+         "TESTING_LAB",
+         "LAB_SAMPLE_ID",
+         "PASSING_2_IN",
+         "PASSING_1_AND_HALF_IN",
+         "PASSING_1_AND_QUARTER_IN",
+         "PASSING_1_IN",
+         "PASSING_3_QUARTERS_IN",
+         "PASSING_5_EIGHTHS_IN",
+         "PASSING_HALF_IN",
+         "PASSING_3_EIGHTS_IN",
+         "PASSING_NUM_4",
+         "PASSING_NUM_8",
+         "PASSING_NUM_10",
+         "PASSING_NUM_16",
+         "PASSING_NUM_20",
+         "PASSING_NUM_30",
+         "PASSING_NUM_40",
+         "PASSING_NUM_50",
+         "PASSING_NUM_60",
+         "PASSING_NUM_100",
+         "PASSING_NUM_200",
+         "PASSING_2_MIN",
+         "PASSING_5_MIN",
+         "PASSING_15_MIN",
+         "PASSING_30_MIN",
+         "PASSING_60_MIN",
+         "PASSING_250_MIN",
+         "PASSING_24_HR",
+         "MM_DIAM_2_MIN",
+         "MM_DIAM_5_MIN",
+         "MM_DIAM_15_MIN",
+         "MM_DIAM_30_MIN",
+         "MM_DIAM_60_MIN",
+         "MM_DIAM_250_MIN",
+         "MM_DIAM_24_HR"
+      ],
+   "MAT_UNBOUND_TUBE_SUCTION" :
+      [
+         "SAMPLE_NO",
+         "TEST_DATE",
+         "HOURS",
+         "DIELECTRIC_VALUE",
+         "CONDUCTIVITY",
+         "MOISTURE_CONTENT_PERCENT",
+         "ACT_WET_DENSITY_PCF",
+         "ACT_DRY_DENSITY_PCF",
+         "RELATIVE_DENSITY"
+      ],
+   "MAT_SOIL_MR_RESULTS" :
+      [
+         "CONF_PRESSURE",
+         "DEVIATOR_LOAD",
+         "LAB_SAMPLE_ID",
+         "K1_NUMBER",
+         "K2_NUMBER",
+         "SAMPLE_END_AREA",
+         "LETTER",
+         "TOP_STRAIN",
+         "RESILIENT_MODULUS",
+         "MOISTURE_CONTENT",
+         "DENSITY_WET_WT",
+         "DENSITY_DRY_WT",
+         "SUBTEST_NAME",
+         "BULK_STRESS",
+         "K3_NUMBER",
+         "K4_NUMBER",
+         "RESIDUAL_STRAIN"
+      ]
+}
+---------------------------------------
+Dcp
+***
+{
+   "rdrive" : "C:",
+   "dataProductDataFolder" : "MnROAD\\Data Product v 1.0\\",
+   "ddByType" : "D. Test Cell Maps and Information\\Design Details by Pavement Type",
+   "measuredDataFolder" : "H. Measured Data\\",
+   "physMeasureFolder" : "Physical Measurements",
+   "pavementTypes" :
+      {
+         "AggCell" : "AGG - Aggregate",
+         "CompositeCell" : "Composite - HMA & PCC",
+         "HmaCell" : "HMA - Asphalt",
+         "PccCell" : "PCC - Concrete"
+      },
+   "overwriteDcpFiles" : "true",
+   "throughYear" : "2010",
+   "dcp_folder" : "Soil Strength\\DCP - Dynamic Cone Penetrometer",
+   "moisture_content_folder" : "Soil Strength\\Moisture Content",
+   "dcpQuery" : "SELECT UNIQUE L.DCP_ID,L.PROJECT_DESC,L.CELL,D.DESIGN_NUMBER DESIGN,L.STATION,L.OFFSET_FT,L.DAY,L.LAYER,L.COMMENTS,L.MOISTURE_PERCENT,L.DENSITY_PCF,L.DEPTH_BELOW_GRADE_IN,V.BLOW_COUNT,V.PROBE_DEPTH_IN FROM MNR.DCP_LOCATION L JOIN MNR.DCP_VALUES V ON V.DCP_ID=L.DCP_ID JOIN (SELECT CELL,CELL_TYPE,FIRST_LAYER_DATE FROM_DATE,NVL(NVL(TO_DATE,LEAD(FIRST_LAYER_DATE-1,1,NULL) OVER (PARTITION BY CELL ORDER BY FIRST_LAYER_DATE)),SYSDATE) TO_DATE,DESIGN_NUMBER FROM MNR.CELL_DESIGN) D ON L.CELL=D.CELL AND L.DAY BETWEEN D.FROM_DATE AND D.TO_DATE WHERE D.CELL_TYPE=? AND L.DAY <= ? ORDER BY CELL,DESIGN_NUMBER,DCP_ID,STATION,OFFSET_FT",
+   "unbound_field_moistureQuery" : "SELECT UNIQUE L.CELL,D.DESIGN_NUMBER DESIGN,NVL(TO_CHAR(L.STATION,'999999'),'Unknown') STATION,NVL(TO_CHAR(L.OFFSET_FT,'999.99'),'Unknown') OFFSET_FT,TO_CHAR(L.DATE_SAMPLE,'yyyy-mm-dd') DAY,L.MOISTURE_CONTENT_PCT MOISTURE_PERCENT,NVL(L.COMMENTS,'None') COMMENTS,L.DATE_TEST,L.MOISTURE_TEST_NO,L.MATERIAL_TESTED FROM MNR.MAT_UNBOUND_FIELD_MOISTURE L JOIN MNR.CELL C ON C.CELL_NUMBER=L.CELL JOIN (SELECT CELL,CELL_TYPE,FIRST_LAYER_DATE FROM_DATE,NVL(NVL(TO_DATE,LEAD(FIRST_LAYER_DATE-1,1,NULL) OVER (PARTITION BY CELL ORDER BY FIRST_LAYER_DATE)),SYSDATE) TO_DATE,DESIGN_NUMBER FROM MNR.CELL_DESIGN) D ON L.CELL=D.CELL AND L.DATE_SAMPLE BETWEEN D.FROM_DATE AND D.TO_DATE WHERE D.CELL_TYPE=? AND L.DATE_SAMPLE <= ? ORDER BY CELL, DESIGN_NUMBER, DAY"
+}
+
+SELECT UNIQUE L.DCP_ID,L.PROJECT_DESC,L.CELL,D.DESIGN_NUMBER,L.STATION,L.OFFSET_FT,L.DAY,L.LAYER,L.COMMENTS,L.MOISTURE_PERCENT,L.DENSITY_PCF,L.DEPTH_BELOW_GRADE_IN,V.BLOW_COUNT,V.PROBE_DEPTH_IN FROM MNR.DCP_LOCATION L JOIN MNR.DCP_VALUES V ON V.DCP_ID=L.DCP_ID JOIN (SELECT CELL,CELL_TYPE,FIRST_LAYER_DATE FROM_DATE,NVL(NVL(TO_DATE,LEAD(FIRST_LAYER_DATE-1,1,NULL) OVER (PARTITION BY CELL ORDER BY FIRST_LAYER_DATE)),SYSDATE) TO_DATE,DESIGN_NUMBER FROM MNR.CELL_DESIGN) D ON L.CELL=D.CELL AND L.DAY BETWEEN D.FROM_DATE AND D.TO_DATE WHERE D.CELL_TYPE=? AND L.DAY <= ? ORDER BY CELL,DESIGN_NUMBER,DCP_ID,STATION,OFFSET_FT
+
+SELECT UNIQUE L.CELL,D.DESIGN_NUMBER,NVL(TO_CHAR(L.STATION,'999999'),'Unknown') STATION,NVL(TO_CHAR(L.OFFSET_FT,'999.99'),'Unknown') OFFSET_FT,TO_CHAR(L.DATE_SAMPLE,'yyyy-mm-dd') DAY,L.MOISTURE_CONTENT_PCT MOISTURE_PERCENT,NVL(L.COMMENTS,'None') COMMENTS,L.DATE_TEST,L.MOISTURE_TEST_NO,L.MATERIAL_TESTED FROM MNR.MAT_UNBOUND_FIELD_MOISTURE L JOIN MNR.CELL C ON C.CELL_NUMBER=L.CELL JOIN (SELECT ID,CELL,CELL_TYPE,FIRST_LAYER_DATE FROM_DATE,NVL(TO_DATE,SYSDATE) TO_DATE,DESIGN_NUMBER FROM (SELECT ID,CELL,CELL_TYPE,FIRST_LAYER_DATE,CONSTRUCTION_ENDED_DATE,NVL(TO_DATE,LEAD(FIRST_LAYER_DATE-1,1,NULL) OVER (PARTITION BY CELL ORDER BY FIRST_LAYER_DATE)) TO_DATE,DESIGN_NUMBER FROM (SELECT * FROM MNR.CELL_DESIGN) ) ) D ON L.CELL=D.CELL AND L.DATE_SAMPLE BETWEEN D.FROM_DATE AND D.TO_DATE WHERE D.CELL_TYPE=? AND L.DATE_SAMPLE <= ? ORDER BY CELL, DAY
+
+
+---------------------------------------
+dummy:dummy
+
+json: {"dummy":"dummy"}
+---------------------------------------
+DataQualityTcJob
+****************
+{
+   "rdrive" : "C:",
+   "matlabInputDir" : "\\data\\TcProdData",
+   "valueColumnNames" :
+      {
+         "TB_VALUES" : "NORTH_VALUE,SOUTH_VALUE",
+         "TD_VALUES" : "VALUE,LA",
+         "HD_VALUES" : "TEMPDIFF,INITTEMP,TEMPAT39SEC"
+      },
+   "fromYear" : "1998",
+   "toYear" : "2000",
+   "cellsQuery" : "SELECT CS.CELL, CS.DESIGN, MIN(FROM_DATE) FROM_DATE, MAX(CELL_END_DATE) TO_DATE, MIN(SEQ) FROM_SEQ, MAX(SEQ) TO_SEQ, COUNT(SEQ) NUM_SENSORS FROM (SELECT CELLS.ID, CELLS.CELL, CELLS.DESIGN, CELLS.FROM_DATE, CELLS.CELL_END_DATE, LN.NAME LANE, M.BASIC_MATERIAL, ROUND((LY.THICKNESS/2.54),2) THICKNESS_IN, SM.MODEL, S.SEQ, S.DATE_INSTALLED, S.DATE_REMOVED,S.SENSOR_DEPTH_IN FROM (SELECT ID,CELL,DESIGN_NUMBER DESIGN,CONSTRUCTION_BEGAN_DATE FROM_DATE, CELL_END_DATE CELL_END_DATE,TO_NUMBER(TO_CHAR(CONSTRUCTION_BEGAN_DATE,'yyyy')) FROM_YEAR,TO_NUMBER(TO_CHAR(CELL_END_DATE,'yyyy')) TO_YEAR FROM (SELECT ID,CELL,CELL_TYPE,CONSTRUCTION_BEGAN_DATE,CONSTRUCTION_ENDED_DATE, NVL(DEMOLISHED_DATE,LEAD(CONSTRUCTION_BEGAN_DATE-1,1,NULL) OVER (PARTITION BY CELL ORDER BY CONSTRUCTION_BEGAN_DATE)) CELL_END_DATE,DESIGN_NUMBER FROM (SELECT ID,CELL_NUMBER CELL,SUBSTR(CLASS,24) CELL_TYPE,(SELECT FIRST_LAYER_DATE FROM MNR.CELLS WHERE ID=C.ID) CONSTRUCTION_BEGAN_DATE,CONSTRUCTION_ENDED_DATE,DEMOLISHED_DATE,CASE WHEN LEAD(ID,1,NULL) OVER (PARTITION BY CELL_NUMBER ORDER BY C.CONSTRUCTION_ENDED_DATE DESC) IS NULL THEN 1WHEN LEAD(ID,2,NULL) OVER (PARTITION BY CELL_NUMBER ORDER BY C.CONSTRUCTION_ENDED_DATE DESC) IS NULL THEN 2WHEN LEAD(ID,3,NULL) OVER (PARTITION BY CELL_NUMBER ORDER BY C.CONSTRUCTION_ENDED_DATE DESC) IS NULL THEN 3WHEN LEAD(ID,4,NULL) OVER (PARTITION BY CELL_NUMBER ORDER BY C.CONSTRUCTION_ENDED_DATE DESC) IS NULL THEN 4WHEN LEAD(ID,5,NULL) OVER (PARTITION BY CELL_NUMBER ORDER BY C.CONSTRUCTION_ENDED_DATE DESC) IS NULL THEN 5ELSE 1 END DESIGN_NUMBER FROM MNR.CELL C))) CELLS JOIN MNR.LANE LN ON LN.CELL_ID=CELLS.ID JOIN MNR.LAYER LY ON LY.LANE_ID=LN.ID JOIN MNR.SENSOR S ON S.LAYER_ID=LY.ID JOIN MNR.SENSOR_MODEL SM ON S.SENSOR_MODEL_ID=SM.ID JOIN MNR.MATERIAL M ON LY.MATERIAL_ID=M.ID WHERE LN.NAME NOT LIKE '%Shldr') CS WHERE CS.MODEL='TC' GROUP BY CELL,DESIGN ORDER BY CELL,DESIGN,FROM_DATE"
+}
+---------------------------------------
